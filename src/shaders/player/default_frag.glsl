@@ -12,7 +12,7 @@ void main() {
   vec3 baseColor = mix(vec3(1.0, 0.2, 0.2), vec3(1.0, 0.6, 0.3), 0.5 + 0.5*sin(time*2.0));
   float c = checker(uv);
   vec3 flagColor = mix(vec3(1.0), vec3(0.0), c);
-  vec3 color = mix(baseColor, flagColor, isJumping);
+    vec3 color = mix(baseColor, flagColor, isJumping);
   color += vec3(1.0,0.9,0.5) * glow * 0.35;
   gl_FragColor = vec4(color, 0.93);
 }

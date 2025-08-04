@@ -52,5 +52,74 @@ export const state = {
   playerUniforms: undefined,
   playerShaderMaterial: undefined,
 
-  trainCubes: []
+  trainCubes: [],
+  isFalling: false,
 };
+
+
+export function resetState() {
+  console.log('reset state')
+  // Game state
+  state.gameOver = false;
+  state.isFalling = false;
+  
+  // Player state
+  state.playerDistance = 0;
+  state.playerOffset = 0;
+  state.isJumping = false;
+  state.jumpTimer = 0;
+  state.cubeRotation = 0;
+  state.targetRotation = 0;
+  state.gracePeriod = 0;
+  
+  // Input state
+  state.inputLeft = false;
+  state.inputRight = false;
+  state.inputUp = false;
+  state.inputDown = false;
+  
+  // Movement state
+  state.speedMultiplier = 1;
+
+  if (state.hyperdrive){
+    state.trainCubes.length = 0;
+  }
+
+  state.hyperdrive = false;
+  state.wasHyperdrive = false;
+  
+  // Obstacles and gaps
+  state.obstacles = [];
+  state.obstacleSpawnTimer = 0;
+  state.riverGaps = [];
+  state.gapSpawnTimer = 0;
+  
+  // River state
+  state.riverTime = 0;
+  
+  // Clear arrays
+  state.obstacles.length = 0;
+  state.riverGaps.length = 0;
+  state.riverMeshes.length = 0;
+  state.riverControlPoints.length = 0;
+  state.riverLengths.length = 0;
+  state.riverTotalLength = 0;
+  
+  // Camera positions
+  state.camPos = new THREE.Vector3();
+  state.camTarget = new THREE.Vector3();
+
+
+  // Note: We don't reset these as they'll be recreated in init():
+  // - scene, camera, renderer
+  // - riverSpline
+  // - player
+  // - starfield, starPositions, starData
+  // - starTrails, starTrailPositions
+  // - riverShaderMaterial
+  // - playerUniforms, playerShaderMaterial
+  
+  // Add any missing state that might have been added during gameplay
+  state.fallTimer = 0;
+  state.fallDirection = null;
+}

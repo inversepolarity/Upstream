@@ -195,8 +195,11 @@ export function getRiverInfoByDistance(distance) {
   return { point, tangent, left, t };
 }
 
-export function isOnRiver(offset) {
-  return Math.abs(offset) < RIVER_WIDTH/2 - PLAYER_SIZE/2;
+export function isOnRiver(offset, playerSize = 0, riverWidth = RIVER_WIDTH) {
+  return (
+    offset - playerSize / 2 >= -riverWidth / 2 &&
+    offset + playerSize / 2 <= riverWidth / 2
+  );
 }
 
 export function spawnGap() {

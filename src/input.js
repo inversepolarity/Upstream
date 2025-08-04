@@ -1,29 +1,36 @@
 import { state } from './state.js';
 import { JUMP_DURATION } from './constants.js';
+import { init, animate } from './engine.js';
 
 window.addEventListener("keydown", e => {
   let k = e.key.toLowerCase();
+
   if (k === "arrowleft" || k === "a") state.inputLeft = true;
   if (k === "arrowright" || k === "d") state.inputRight = true;
+
   if (k === " " || k === "w") {
     state.inputUp = true;
     state.speedMultiplier = 8;
     if (!state.hyperdrive) state.wasHyperdrive = false;
     state.hyperdrive = true;
   }
+
   if (k === "arrowdown" || k === "s") { state.inputDown = true; state.speedMultiplier = 0.5; }
+
   if ((e.key === " " || e.code === "ArrowUp") && !state.isJumping && !state.gameOver) {
     state.isJumping = true; 
     state.jumpTimer = JUMP_DURATION;
   }
+
   if (state.gameOver && k === "r") {
-    obstacles.forEach(obs => { 
+
+    state.obstacles.forEach(obs => { 
       state.scene.remove(obs); 
       obs.geometry.dispose(); 
       obs.material.dispose(); 
     });
 
-    riverMeshes.forEach(mesh => { 
+    state.riverMeshes.forEach(mesh => { 
       state.scene.remove(mesh); 
       mesh.geometry.dispose(); 
       mesh.material.dispose(); 
@@ -52,26 +59,16 @@ window.addEventListener("keydown", e => {
       });
     });
 
-    state.riverGaps = []; 
-    state.gapSpawnTimer = 0; 
-    state.isJumping = false; 
-    state.jumpTimer = 0; 
-    state.hyperdrive = false;
-    state.wasHyperdrive = false;
-    state.riverShaderMaterial = null; 
-    state.riverTime = 0; 
-    state.playerShaderMaterial = null; 
-    state.playerUniforms = null;
-
     init(); 
-    animate();
   }
 });
 
 window.addEventListener("keyup", e => {
   let k = e.key.toLowerCase();
+  
   if (k === "arrowleft" || k === "a") state.inputLeft = false;
   if (k === "arrowright" || k === "d") state.inputRight = false;
+
   if (k === " " || k === "w") { 
     state.inputUp = false; 
     state.speedMultiplier = 1; 
