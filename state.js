@@ -1,0 +1,13 @@
+let scene, camera, renderer;
+let riverMeshes = [], riverSpline, riverControlPoints = [], riverLengths = [], riverTotalLength = 0;
+let player, playerDistance = 0, playerOffset = 0, gameOver = false;
+let inputLeft = false, inputRight = false, inputUp = false, inputDown = false;
+let gracePeriod = 0, cubeRotation = 0, targetRotation = 0;
+let obstacles = [], obstacleSpawnTimer = 0, speedMultiplier = 1;
+let camPos = new THREE.Vector3(), camTarget = new THREE.Vector3();
+let starfield, starPositions, starData;
+let starTrails, starTrailPositions, hyperdrive = false, wasHyperdrive = false;
+let riverGaps = [], gapSpawnTimer = 0, isJumping = false, jumpTimer = 0;
+let riverShaderMaterial, riverTime = 0;
+let playerUniforms, playerShaderMaterial;
+let trainCubes = [];

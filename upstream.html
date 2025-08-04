@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Infinite River Hyperdrive</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #000; }
+    #gameover {
+      position: absolute; top: 40%; left: 0; right: 0;
+      text-align: center; color: #fff; font-size: 2em;
+      font-family: sans-serif; display: none;
+      text-shadow: 0 0 8px #000, 0 0 16px #000;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+<div id="gameover">Game Over!<br>Press R to Restart</div>
+<script src="./three.min.js"></script>
+
+<!-- Game Constants -->
+<script src="./constants.js"> </script>
+
+<!-- Game State -->
+<script src="./state.js"> </script>
+
+<!-- Starfield System and backdrop -->
+<script src="./backdrop.js"> </script>
+
+<!-- River Generation -->
+<script src="./river.js"> </script>
+
+<!-- Player & Train System -->
+<script src="./player.js"> </script>
+
+<!-- Obstacles -->
+<script src="./enemies.js"> </script>
+
+<!-- Game Engine -->
+<script src="./engine.js"> </script>
+
+<!-- Input System -->
+<script src="./input.js"> </script>
+
+<!-- Game Start -->
+<script>
+init();
+animate();
+</script>
+</body>
+</html>
