@@ -1,5 +1,10 @@
-function spawnObstacle() {
-  let dist = playerDistance + 80 + Math.random()*180;
+import * as THREE from 'three';
+import { state } from './state.js';
+import { getRiverInfoByDistance } from './river.js';
+import { RIVER_WIDTH, OBSTACLE_COLORS } from './constants.js';
+
+export function spawnObstacle() {
+  let dist = state.playerDistance + 80 + Math.random()*180;
   let info = getRiverInfoByDistance(dist);
   let offset = (Math.random()-0.5)*(RIVER_WIDTH-3);
   let pos = info.point.clone().add(info.left.clone().multiplyScalar(offset));
@@ -19,5 +24,6 @@ function spawnObstacle() {
   let obstacle = new THREE.Mesh(geometry, material);
   obstacle.position.copy(pos); obstacle.position.y += size/2 + 0.3;
   obstacle.userData = { distance: dist, speed: 0.7 + Math.random() * 0.3, size: size, offset: offset };
-  scene.add(obstacle); obstacles.push(obstacle);
+  state.scene.add(obstacle); 
+  state.obstacles.push(obstacle);
 }
