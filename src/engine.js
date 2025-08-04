@@ -7,6 +7,9 @@ import { spawnObstacle } from './enemies.js';
 import { spawnGap  } from './river.js';
 import { isOnRiver, generateInitialRiver, createRiverMesh, getRiverInfoByDistance, extendRiverIfNeeded, pruneRiverBehind } from './river.js';
 
+import player_default_vertex from './shaders/player/default_vertex.glsl';
+import player_default_frag from './shaders/player/default_frag.glsl';
+
 export function init() {
   state.scene = new THREE.Scene();
   state.scene.background = new THREE.Color(0x000011);
@@ -24,29 +27,8 @@ export function init() {
   state.playerUniforms = { time: { value: 0 }, isJumping: { value: 0 } };
   state.playerShaderMaterial = new THREE.ShaderMaterial({
     uniforms: state.playerUniforms,
-    vertexShader: `
-      varying vec3 vPosition;
-      void main() { vPosition = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }
-    `,
-    fragmentShader: `
-      uniform float time, isJumping;
-      varying vec3 vPosition;
-      float checker(vec2 uv) {
-        float cx = step(0.5, fract(uv.x * 4.0));
-        float cy = step(0.5, fract(uv.y * 4.0));
-        return mod(cx + cy, 2.0);
-      }
-      void main() {
-        vec2 uv = abs(vPosition.xy); uv = mod(uv, 1.0);
-        float glow = 0.5 + 0.5 * exp(-dot(vPosition.xy, vPosition.xy) * 1.5);
-        vec3 baseColor = mix(vec3(1.0, 0.2, 0.2), vec3(1.0, 0.6, 0.3), 0.5 + 0.5*sin(time*2.0));
-        float c = checker(uv);
-        vec3 flagColor = mix(vec3(1.0), vec3(0.0), c);
-        vec3 color = mix(baseColor, flagColor, isJumping);
-        color += vec3(1.0,0.9,0.5) * glow * 0.35;
-        gl_FragColor = vec4(color, 0.93);
-      }
-    `,
+    vertexShader: player_default_vertex,
+    fragmentShader: player_default_frag,
     transparent: true
   });
 

@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 import { state } from './state.js';
+
+import { PLAYER_SIZE, MIN_POINTS_BEHIND, MIN_POINTS_AHEAD, CONTROL_POINTS, RIVER_WIDTH, SEGMENT_LENGTH, PATH_SEGMENTS  } from './constants.js';
+
 import river_default_vertex from './shaders/river/vertex.glsl';
 import river_default_frag from './shaders/river/fragment.glsl';
-import { PLAYER_SIZE, MIN_POINTS_BEHIND, MIN_POINTS_AHEAD, CONTROL_POINTS, RIVER_WIDTH, SEGMENT_LENGTH, PATH_SEGMENTS  } from './constants.js';
 
 // Check if two 2D line segments intersect
 function segmentsIntersect(p1, q1, p2, q2) {

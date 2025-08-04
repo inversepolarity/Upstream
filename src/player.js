@@ -3,6 +3,9 @@ import { state } from './state.js';
 import { PLAYER_SIZE, JUMP_DURATION, JUMP_HEIGHT  } from './constants.js';
 import { getRiverInfoByDistance } from './river.js';
 
+import player_super_vertex from './shaders/player/superpos_vertex.glsl';
+import player_super_frag from './shaders/player/superpos_frag.glsl';
+
 export function createTrainCubes() {
   state.trainCubes = [];
   const geo = new THREE.BoxGeometry(PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE);
@@ -12,19 +15,8 @@ export function createTrainCubes() {
     if (i === 4) {
       material = new THREE.ShaderMaterial({
         uniforms: { time: { value: 0 } },
-        vertexShader: `
-          varying vec3 vPosition;
-          void main() { vPosition = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }
-        `,
-        fragmentShader: `
-          uniform float time;
-          varying vec3 vPosition;
-          void main() {
-            vec3 color = vec3(0.5, 0.8, 1.0);
-            float alpha = 0.3 + 0.2 * sin(time * 3.0);
-            gl_FragColor = vec4(color, alpha);
-          }
-        `,
+        vertexShader: player_super_vertex,
+        fragmentShader: player_super_frag,
         transparent: true
       });
     } else {
