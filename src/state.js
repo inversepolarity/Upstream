@@ -10,6 +10,7 @@ export const state = {
   riverControlPoints: [],
   riverLengths: [],
   riverTotalLength: 0,
+  riverWidths: [],
 
   player: undefined,
   playerDistance: 0,
@@ -104,7 +105,8 @@ export function resetState() {
   state.riverControlPoints.length = 0;
   state.riverLengths.length = 0;
   state.riverTotalLength = 0;
-  
+  state.riverWidths.length = 0;
+
   // Camera positions
   state.camPos = new THREE.Vector3();
   state.camTarget = new THREE.Vector3();

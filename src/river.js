@@ -132,6 +132,14 @@ export function generateInitialRiver() {
   for (let i = 0; i < CONTROL_POINTS; i++) {
     let cp = addControlPoint(pos, angle);
     state.riverControlPoints.push(cp.pos);
+    const base = RIVER_WIDTH;
+    const min = base * 0.5;
+    const amp = base * 0.25;
+    const freq = 0.003; // wavelength ~ 2000 units
+
+    let distance = state.riverControlPoints.length * SEGMENT_LENGTH; // rough
+    let width = min + amp + Math.sin(distance * freq) * amp;
+    state.riverWidths.push(width);    
     pos = cp.pos; angle = cp.angle;
   }
   updateRiverSpline();
@@ -144,6 +152,14 @@ export function extendRiverIfNeeded() {
     let lastAngle = Math.atan2(lastPos.x - prevPos.x, -(lastPos.z - prevPos.z));
     let cp = addControlPoint(lastPos, lastAngle);
     state.riverControlPoints.push(cp.pos);
+    const base = RIVER_WIDTH;
+    const min = base * 0.5;
+    const amp = base * 0.25;
+    const freq = 0.003; // wavelength ~ 2000 units
+
+    let distance = state.riverControlPoints.length * SEGMENT_LENGTH; // rough
+    let width = min + amp + Math.sin(distance * freq) * amp;
+    state.riverWidths.push(width);        
     updateRiverSpline();
     createRiverMesh();
   }
@@ -155,6 +171,7 @@ export function pruneRiverBehind() {
     let removedLength = state.riverLengths[1] - state.riverLengths[0];
     state.riverControlPoints.shift(); 
     state.riverLengths.shift();
+    state.riverWidths.shift();
     state.playerDistance -= removedLength;
     state.obstacles.forEach(obs => obs.userData.distance -= removedLength);
     state.riverGaps.forEach(gap => gap.distance -= removedLength);
@@ -174,7 +191,7 @@ function updateRiverSpline() {
   state.riverTotalLength = total;
 }
 
-function distanceToT(distance) {
+export function distanceToT(distance) {
   for (let i = 1; i < state.riverLengths.length; i++) {
     if (distance < state.riverLengths[i]) {
       let segStart = state.riverLengths[i-1], segEnd = state.riverLengths[i];
@@ -195,7 +212,8 @@ export function getRiverInfoByDistance(distance) {
   return { point, tangent, left, t };
 }
 
-export function isOnRiver(offset, playerSize = 0, riverWidth = RIVER_WIDTH) {
+export function isOnRiver(offset, playerSize = 0, distance = state.playerDistance) {
+  const riverWidth = getWidthAt(distanceToT(distance));
   return (
     offset - playerSize / 2 >= -riverWidth / 2 &&
     offset + playerSize / 2 <= riverWidth / 2
@@ -209,6 +227,41 @@ export function spawnGap() {
   createRiverMesh();
 }
 
+export function getWidthAt(t) {
+  let count = state.riverControlPoints.length;
+  if (count < 2) return RIVER_WIDTH;
+
+  // Interpolate width between nearest control points
+  let ft = t * (count - 1);
+  let i = Math.floor(ft);
+  let frac = ft - i;
+
+  let w0 = state.riverWidths[i] ?? RIVER_WIDTH;
+  let w1 = state.riverWidths[i + 1] ?? w0;
+
+  return w0 * (1 - frac) + w1 * frac;
+}
+
+export function getRiverCurveHeight(offset, distance) {
+  const curveDepth = 2.5; // Match the curve depth from createRiverMesh
+  
+  let dynamicWidth = getWidthAt(distanceToT(distance));
+  let widthRatio = (offset + dynamicWidth/2) / dynamicWidth; // 0 to 1 from left to right
+  let normalizedOffset = (widthRatio - 0.5) * 2; // -1 to 1
+  
+  // Parabolic curve: deepest at edges, flat in center
+  return -curveDepth * Math.pow(Math.abs(normalizedOffset), 3);
+}
+
+export function getRiverPositionWithCurve(distance, offset) {
+  let info = getRiverInfoByDistance(distance);
+  let curveHeight = getRiverCurveHeight(offset, distance);
+  
+  let position = info.point.clone().add(info.left.clone().multiplyScalar(offset));
+  position.y += curveHeight;
+  
+  return { position, info, curveHeight };
+}
 
 // <!-- River Mesh & Rendering -->
 export function createRiverMesh() {
@@ -226,10 +279,12 @@ export function createRiverMesh() {
   const STRAIGHTEN_START = 0.85;
 
   let visibleRanges = [], segStart = 0, segEnd = state.riverTotalLength;
+
   let gapsInSegment = state.riverGaps
     .filter(gap => !(gap.distance + gap.width/2 <= segStart || gap.distance - gap.width/2 >= segEnd))
     .sort((a, b) => (a.distance - a.width/2) - (b.distance - b.width/2));
   let cursor = segStart;
+
   for (let gap of gapsInSegment) {
     let gapStart = Math.max(segStart, gap.distance - gap.width/2);
     let gapEnd = Math.min(segEnd, gap.distance + gap.width/2);
@@ -239,33 +294,67 @@ export function createRiverMesh() {
   if (cursor < segEnd) visibleRanges.push([cursor, segEnd]);
   if (visibleRanges.length === 0) visibleRanges.push([segStart, segEnd]);
 
+
   for (let [rangeStart, rangeEnd] of visibleRanges) {
     if (rangeEnd - rangeStart < 1) continue;
     let segLen = rangeEnd - rangeStart;
     let segs = Math.max(2, Math.floor(PATH_SEGMENTS * segLen / state.riverTotalLength));
+    
+    // Add width segments for the curve
+    const widthSegments = 8; // Number of segments across the width
+    const curveDepth = 2.5; // How deep the edges curve down
+    
     let vertices = [], uvs = [], indices = [];
+    
     for (let j = 0; j < segs; j++) {
       let d = rangeStart + (rangeEnd - rangeStart) * (j / (segs - 1));
       let t = distanceToT(d);
+      let width = getWidthAt(t); // only once
+
       let center = state.riverSpline.getPoint(t);
       let tNorm = d / state.riverTotalLength;
+      
       if (tNorm > STRAIGHTEN_START) {
         let blend = (tNorm - STRAIGHTEN_START) / (1 - STRAIGHTEN_START);
         let straightDist = d;
         let straightPoint = camOrigin.clone().add(camDir.clone().multiplyScalar(straightDist));
         center.lerp(straightPoint, blend);
       }
+      
       let tangent = state.riverSpline.getTangent(t).normalize();
-      let left = new THREE.Vector3().crossVectors(up, tangent).normalize().multiplyScalar(RIVER_WIDTH/2);
-      let right = left.clone().negate();
-      vertices.push(center.x + left.x, center.y + left.y, center.z + left.z);
-      vertices.push(center.x + right.x, center.y + right.y, center.z + right.z);
-      uvs.push(0, j / (segs - 1)); uvs.push(1, j / (segs - 1));
+      let left = new THREE.Vector3().crossVectors(up, tangent).normalize();
+      
+      // Create vertices across the width
+      for (let k = 0; k <= widthSegments; k++) {
+        let widthRatio = k / widthSegments; // 0 to 1 from left to right
+        let localWidth = getWidthAt(t); // NEW: dynamic width at t
+        let offset = (widthRatio - 0.5) * width;
+
+        
+        // Calculate curve: parabolic shape, lowest at edges
+        let normalizedOffset = (widthRatio - 0.5) * 2; // -1 to 1
+        let yCurve = -curveDepth * Math.pow(Math.abs(normalizedOffset), 3);
+
+        
+        let pos = center.clone().add(left.clone().multiplyScalar(offset));
+        vertices.push(pos.x, pos.y + yCurve, pos.z);
+        uvs.push(widthRatio, j / (segs - 1));
+      }
     }
-    for (let j = 0; j < segs-1; j++) {
-      let a = j*2, b = j*2+1, c = j*2+2, d2 = j*2+3;
-      indices.push(a, b, c, b, d2, c);
+    
+    // Create indices for the mesh
+    for (let j = 0; j < segs - 1; j++) {
+      for (let k = 0; k < widthSegments; k++) {
+        let a = j * (widthSegments + 1) + k;
+        let b = a + 1;
+        let c = a + (widthSegments + 1);
+        let d = c + 1;
+        
+        indices.push(a, c, b);
+        indices.push(b, c, d);
+      }
     }
+    
     let geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
@@ -285,12 +374,14 @@ export function createRiverMesh() {
     }
 
     let mesh = new THREE.Mesh(geometry, state.riverShaderMaterial);
-    state.scene.add(mesh); state.riverMeshes.push(mesh);
+    state.scene.add(mesh); 
+    state.riverMeshes.push(mesh);
   }
 
   for (let gap of state.riverGaps) {
     if (!gap.edgeMesh) {
-      let edgeGeo = new THREE.CylinderGeometry(RIVER_WIDTH/2, RIVER_WIDTH/2, 0.2, 32, 1, true);
+      let widthAtGap = getWidthAt(distanceToT(gap.distance));
+      let edgeGeo = new THREE.CylinderGeometry(widthAtGap/2, widthAtGap/2, 0.2, 32, 1, true);
       let edgeMat = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
       let mesh1 = new THREE.Mesh(edgeGeo, edgeMat), mesh2 = new THREE.Mesh(edgeGeo, edgeMat);
       mesh1.rotation.x = mesh2.rotation.x = Math.PI/2;
@@ -302,3 +393,4 @@ export function createRiverMesh() {
     }
   }
 }
+

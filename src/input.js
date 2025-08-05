@@ -8,7 +8,7 @@ window.addEventListener("keydown", e => {
   if (k === "arrowleft" || k === "a") state.inputLeft = true;
   if (k === "arrowright" || k === "d") state.inputRight = true;
 
-  if (k === " " || k === "w") {
+  if (k === " ") {
     state.inputUp = true;
     state.speedMultiplier = 8;
     if (!state.hyperdrive) state.wasHyperdrive = false;
@@ -17,7 +17,7 @@ window.addEventListener("keydown", e => {
 
   if (k === "arrowdown" || k === "s") { state.inputDown = true; state.speedMultiplier = 0.5; }
 
-  if ((e.key === " " || e.code === "ArrowUp") && !state.isJumping && !state.gameOver) {
+  if ((e.key === "w" || e.code === "ArrowUp") && !state.isJumping && !state.gameOver) {
     state.isJumping = true; 
     state.jumpTimer = JUMP_DURATION;
   }
@@ -69,7 +69,7 @@ window.addEventListener("keyup", e => {
   if (k === "arrowleft" || k === "a") state.inputLeft = false;
   if (k === "arrowright" || k === "d") state.inputRight = false;
 
-  if (k === " " || k === "w") { 
+  if (k === " ") { 
     state.inputUp = false; 
     state.speedMultiplier = 1; 
 
