@@ -137,19 +137,22 @@ function distancePointToSegment(point, segStart, segEnd) {
   return Math.sqrt(dx * dx + dz * dz);
 }
 
+
 function shouldForceDefaultWidth(distance) {
   // Force default width every 800-1200 units
   const resetInterval = 1000;
   const resetVariation = 200;
   const localCycle = distance % (resetInterval + Math.sin(distance * 0.001) * resetVariation);
-
+  
   // Create reset zones (50 units wide)
   return localCycle < 50;
 }
 
+
 function smoothWidthTransition(currentWidth, targetWidth, smoothingFactor = 0.15) {
   return currentWidth + (targetWidth - currentWidth) * smoothingFactor;
 }
+
 
 export function generateInitialRiver() {
   state.riverControlPoints = [];
@@ -158,36 +161,36 @@ export function generateInitialRiver() {
   for (let i = 0; i < CONTROL_POINTS; i++) {
     let cp = addControlPoint(pos, angle);
     state.riverControlPoints.push(cp.pos);
-    // Replace the entire width calculation section with:
-    const base = RIVER_WIDTH;
-    let distance = state.riverControlPoints.length * SEGMENT_LENGTH;
+// Replace the entire width calculation section with:
+const base = RIVER_WIDTH;
+let distance = state.riverControlPoints.length * SEGMENT_LENGTH;
 
-    // Much more dramatic variation (0.2x to 3x base width)
-    const minWidth = base * 0.2; // Very narrow
-    const maxWidth = base * 3.0; // Very wide
+// Much more dramatic variation (0.2x to 3x base width)
+const minWidth = base * 0.2;  // Very narrow
+const maxWidth = base * 3.0;  // Very wide
 
-    // Faster frequency changes for more visible variation
-    const primaryWave = Math.sin(distance * 0.008) * 0.6; // Increased frequency and amplitude
-    const secondaryWave = Math.sin(distance * 0.02) * 0.3;
+// Faster frequency changes for more visible variation
+const primaryWave = Math.sin(distance * 0.008) * 0.6;  // Increased frequency and amplitude
+const secondaryWave = Math.sin(distance * 0.02) * 0.3;
 
-    // More frequent resets
-    const resetCycle = Math.sin(distance * 0.003) > 0.7 ? 0 : primaryWave + secondaryWave;
+// More frequent resets
+const resetCycle = Math.sin(distance * 0.003) > 0.7 ? 0 : primaryWave + secondaryWave;
 
-    let targetWidth = base + (maxWidth - base) * resetCycle;
-    targetWidth = Math.max(minWidth, Math.min(maxWidth, targetWidth));
+let targetWidth = base + (maxWidth - base) * resetCycle;
+targetWidth = Math.max(minWidth, Math.min(maxWidth, targetWidth));
 
-    if (shouldForceDefaultWidth(distance)) {
-      targetWidth = base;
-    }
+if (shouldForceDefaultWidth(distance)) {
+  targetWidth = base;
+}
 
-    // Remove smoothing for now to see raw changes
-    let width = targetWidth;
+// Remove smoothing for now to see raw changes
+let width = targetWidth;
 
-    state.riverWidths.push(width);
+state.riverWidths.push(width);
 
-    state.riverWidths.push(width);
-    pos = cp.pos;
-    angle = cp.angle;
+
+    state.riverWidths.push(width);    
+    pos = cp.pos; angle = cp.angle;
   }
   updateRiverSpline();
 }
@@ -200,38 +203,38 @@ export function extendRiverIfNeeded() {
     let lastAngle = Math.atan2(lastPos.x - prevPos.x, -(lastPos.z - prevPos.z));
     let cp = addControlPoint(lastPos, lastAngle);
     state.riverControlPoints.push(cp.pos);
-    // Replace the entire width calculation section with:
-    const base = RIVER_WIDTH;
-    let distance = state.riverControlPoints.length * SEGMENT_LENGTH;
+// Replace the entire width calculation section with:
+const base = RIVER_WIDTH;
+let distance = state.riverControlPoints.length * SEGMENT_LENGTH;
 
-    // Much more dramatic variation (0.2x to 3x base width)
-    const minWidth = base * 0.2; // Very narrow
-    const maxWidth = base * 3.0; // Very wide
+// Much more dramatic variation (0.2x to 3x base width)
+const minWidth = base * 0.2;  // Very narrow
+const maxWidth = base * 3.0;  // Very wide
 
-    // Faster frequency changes for more visible variation
-    const primaryWave = Math.sin(distance * 0.008) * 0.6; // Increased frequency and amplitude
-    const secondaryWave = Math.sin(distance * 0.02) * 0.3;
+// Faster frequency changes for more visible variation
+const primaryWave = Math.sin(distance * 0.008) * 0.6;  // Increased frequency and amplitude
+const secondaryWave = Math.sin(distance * 0.02) * 0.3;
 
-    // More frequent resets
-    const resetCycle = Math.sin(distance * 0.003) > 0.7 ? 0 : primaryWave + secondaryWave;
+// More frequent resets
+const resetCycle = Math.sin(distance * 0.003) > 0.7 ? 0 : primaryWave + secondaryWave;
 
-    let targetWidth = base + (maxWidth - base) * resetCycle;
-    targetWidth = Math.max(minWidth, Math.min(maxWidth, targetWidth));
+let targetWidth = base + (maxWidth - base) * resetCycle;
+targetWidth = Math.max(minWidth, Math.min(maxWidth, targetWidth));
 
-    if (shouldForceDefaultWidth(distance)) {
-      targetWidth = base;
-    }
+if (shouldForceDefaultWidth(distance)) {
+  targetWidth = base;
+}
 
-    // Remove smoothing for now to see raw changes
-    let width = targetWidth;
+// Remove smoothing for now to see raw changes
+let width = targetWidth;
 
-    state.riverWidths.push(width);
-    // Smooth transition from previous width
-    let prevWidth =
-      state.riverWidths.length > 0 ? state.riverWidths[state.riverWidths.length - 1] : base;
-    width = smoothWidthTransition(prevWidth, targetWidth);
+state.riverWidths.push(width);
+// Smooth transition from previous width
+let prevWidth = state.riverWidths.length > 0 ? state.riverWidths[state.riverWidths.length - 1] : base;
+ width = smoothWidthTransition(prevWidth, targetWidth);
 
-    state.riverWidths.push(width);
+
+    state.riverWidths.push(width);        
     updateRiverSpline();
     createRiverMesh();
   }
@@ -294,7 +297,10 @@ export function getRiverInfoByDistance(distance) {
 
 export function isOnRiver(offset, playerSize = 0, distance = state.playerDistance) {
   const riverWidth = getWidthAt(distanceToT(distance));
-  return offset - playerSize / 2 >= -riverWidth / 2 && offset + playerSize / 2 <= riverWidth / 2;
+  return (
+    offset - playerSize / 2 >= -riverWidth / 2 &&
+    offset + playerSize / 2 <= riverWidth / 2
+  );
 }
 
 export function spawnGap() {
@@ -321,11 +327,11 @@ export function getWidthAt(t) {
 
 export function getRiverCurveHeight(offset, distance) {
   const curveDepth = 2.5; // Match the curve depth from createRiverMesh
-
+  
   let dynamicWidth = getWidthAt(distanceToT(distance));
-  let widthRatio = (offset + dynamicWidth / 2) / dynamicWidth; // 0 to 1 from left to right
+  let widthRatio = (offset + dynamicWidth/2) / dynamicWidth; // 0 to 1 from left to right
   let normalizedOffset = (widthRatio - 0.5) * 2; // -1 to 1
-
+  
   // Parabolic curve: deepest at edges, flat in center
   return -curveDepth * Math.pow(Math.abs(normalizedOffset), 3);
 }
@@ -333,10 +339,10 @@ export function getRiverCurveHeight(offset, distance) {
 export function getRiverPositionWithCurve(distance, offset) {
   let info = getRiverInfoByDistance(distance);
   let curveHeight = getRiverCurveHeight(offset, distance);
-
+  
   let position = info.point.clone().add(info.left.clone().multiplyScalar(offset));
   position.y += curveHeight;
-
+  
   return { position, info, curveHeight };
 }
 
@@ -355,9 +361,7 @@ export function createRiverMesh() {
   let camOrigin = state.camPos.clone();
   const STRAIGHTEN_START = 0.85;
 
-  let visibleRanges = [],
-    segStart = 0,
-    segEnd = state.riverTotalLength;
+  let visibleRanges = [], segStart = 0, segEnd = state.riverTotalLength;
 
   let gapsInSegment = state.riverGaps
     .filter(
@@ -375,19 +379,18 @@ export function createRiverMesh() {
   if (cursor < segEnd) visibleRanges.push([cursor, segEnd]);
   if (visibleRanges.length === 0) visibleRanges.push([segStart, segEnd]);
 
+
   for (let [rangeStart, rangeEnd] of visibleRanges) {
     if (rangeEnd - rangeStart < 1) continue;
     let segLen = rangeEnd - rangeStart;
-    let segs = Math.max(2, Math.floor((PATH_SEGMENTS * segLen) / state.riverTotalLength));
-
+    let segs = Math.max(2, Math.floor(PATH_SEGMENTS * segLen / state.riverTotalLength));
+    
     // Add width segments for the curve
     const widthSegments = 8; // Number of segments across the width
     const curveDepth = 2.5; // How deep the edges curve down
-
-    let vertices = [],
-      uvs = [],
-      indices = [];
-
+    
+    let vertices = [], uvs = [], indices = [];
+    
     for (let j = 0; j < segs; j++) {
       let d = rangeStart + (rangeEnd - rangeStart) * (j / (segs - 1));
       let t = distanceToT(d);
@@ -395,32 +398,35 @@ export function createRiverMesh() {
 
       let center = state.riverSpline.getPoint(t);
       let tNorm = d / state.riverTotalLength;
-
+      
       if (tNorm > STRAIGHTEN_START) {
         let blend = (tNorm - STRAIGHTEN_START) / (1 - STRAIGHTEN_START);
         let straightDist = d;
         let straightPoint = camOrigin.clone().add(camDir.clone().multiplyScalar(straightDist));
         center.lerp(straightPoint, blend);
       }
-
+      
       let tangent = state.riverSpline.getTangent(t).normalize();
       let left = new THREE.Vector3().crossVectors(up, tangent).normalize();
-
+      
       // Create vertices across the width
       for (let k = 0; k <= widthSegments; k++) {
         let widthRatio = k / widthSegments; // 0 to 1 from left to right
+        let localWidth = getWidthAt(t); // NEW: dynamic width at t
         let offset = (widthRatio - 0.5) * width;
 
+        
         // Calculate curve: parabolic shape, lowest at edges
         let normalizedOffset = (widthRatio - 0.5) * 2; // -1 to 1
         let yCurve = -curveDepth * Math.pow(Math.abs(normalizedOffset), 3);
 
+        
         let pos = center.clone().add(left.clone().multiplyScalar(offset));
         vertices.push(pos.x, pos.y + yCurve, pos.z);
         uvs.push(widthRatio, j / (segs - 1));
       }
     }
-
+    
     // Create indices for the mesh
     for (let j = 0; j < segs - 1; j++) {
       for (let k = 0; k < widthSegments; k++) {
@@ -428,12 +434,12 @@ export function createRiverMesh() {
         let b = a + 1;
         let c = a + (widthSegments + 1);
         let d = c + 1;
-
+        
         indices.push(a, c, b);
         indices.push(b, c, d);
       }
     }
-
+    
     let geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
@@ -453,28 +459,23 @@ export function createRiverMesh() {
     }
 
     let mesh = new THREE.Mesh(geometry, state.riverShaderMaterial);
-    state.scene.add(mesh);
+    state.scene.add(mesh); 
     state.riverMeshes.push(mesh);
   }
 
   for (let gap of state.riverGaps) {
     if (!gap.edgeMesh) {
       let widthAtGap = getWidthAt(distanceToT(gap.distance));
-      let edgeGeo = new THREE.CylinderGeometry(widthAtGap / 2, widthAtGap / 2, 0.2, 32, 1, true);
-      let edgeMat = new THREE.MeshBasicMaterial({
-        color: 0xffff00,
-        transparent: true,
-        opacity: 0.5,
-        side: THREE.DoubleSide,
-      });
-      let mesh1 = new THREE.Mesh(edgeGeo, edgeMat),
-        mesh2 = new THREE.Mesh(edgeGeo, edgeMat);
-      mesh1.rotation.x = mesh2.rotation.x = Math.PI / 2;
-      mesh1.position.copy(state.riverSpline.getPoint(distanceToT(gap.distance - gap.width / 2)));
-      mesh2.position.copy(state.riverSpline.getPoint(distanceToT(gap.distance + gap.width / 2)));
-      state.scene.add(mesh1);
+      let edgeGeo = new THREE.CylinderGeometry(widthAtGap/2, widthAtGap/2, 0.2, 32, 1, true);
+      let edgeMat = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
+      let mesh1 = new THREE.Mesh(edgeGeo, edgeMat), mesh2 = new THREE.Mesh(edgeGeo, edgeMat);
+      mesh1.rotation.x = mesh2.rotation.x = Math.PI/2;
+      mesh1.position.copy(state.riverSpline.getPoint(distanceToT(gap.distance - gap.width/2)));
+      mesh2.position.copy(state.riverSpline.getPoint(distanceToT(gap.distance + gap.width/2)));
+      state.scene.add(mesh1); 
       state.scene.add(mesh2);
       gap.edgeMesh = [mesh1, mesh2];
     }
   }
 }
+

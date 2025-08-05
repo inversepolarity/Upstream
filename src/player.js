@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { state } from './state.js';
-import { PLAYER_SIZE } from './constants.js';
-import { getRiverPositionWithCurve } from './river.js';
+import { PLAYER_SIZE, JUMP_DURATION, JUMP_HEIGHT  } from './constants.js';
+import { getRiverPositionWithCurve, getRiverInfoByDistance, getWidthAt, distanceToT  } from './river.js';
 
 import player_super_vertex from './shaders/player/superpos_vertex.glsl';
 import player_super_frag from './shaders/player/superpos_frag.glsl';
@@ -29,18 +29,19 @@ export function createTrainCubes() {
   }
 }
 
-export function updateTrainPosition() {
-  const CUBE_SPACING = 3;
 
+export function updateTrainPosition(info, tangent) {
+  const CUBE_SPACING = 3;
+  
   state.trainCubes.forEach((cube, index) => {
     let cubeDistance = state.playerDistance - (index + 1) * CUBE_SPACING;
-
+    
     // Use helper function for train cube positioning
     let cubeRiverPos = getRiverPositionWithCurve(cubeDistance, state.playerOffset);
-
+    
     cube.position.copy(cubeRiverPos.position);
-    cube.position.y += PLAYER_SIZE / 2;
-
+    cube.position.y += PLAYER_SIZE/2;
+    
     // Align with river direction
     let cubeForward = cubeRiverPos.info.tangent;
     cube.lookAt(cube.position.clone().add(cubeForward));
