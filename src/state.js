@@ -54,6 +54,7 @@ export const state = {
 
   trainCubes: [],
   isFalling: false,
+  riverWidths: [],
 };
 
 export function resetState() {
@@ -103,7 +104,7 @@ export function resetState() {
   state.riverControlPoints.length = 0;
   state.riverLengths.length = 0;
   state.riverTotalLength = 0;
-  
+
   // Camera positions
   state.camPos = new THREE.Vector3();
   state.camTarget = new THREE.Vector3();
