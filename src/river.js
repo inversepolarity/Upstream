@@ -126,19 +126,57 @@ function distancePointToSegment(point, segStart, segEnd) {
   return Math.sqrt(dx * dx + dz * dz);
 }
 
+
+function shouldForceDefaultWidth(distance) {
+  // Force default width every 800-1200 units
+  const resetInterval = 1000;
+  const resetVariation = 200;
+  const localCycle = distance % (resetInterval + Math.sin(distance * 0.001) * resetVariation);
+  
+  // Create reset zones (50 units wide)
+  return localCycle < 50;
+}
+
+
+function smoothWidthTransition(currentWidth, targetWidth, smoothingFactor = 0.15) {
+  return currentWidth + (targetWidth - currentWidth) * smoothingFactor;
+}
+
+
 export function generateInitialRiver() {
   state.riverControlPoints = [];
   let pos = new THREE.Vector3(0, 0, 0), angle = 0;
   for (let i = 0; i < CONTROL_POINTS; i++) {
     let cp = addControlPoint(pos, angle);
     state.riverControlPoints.push(cp.pos);
-    const base = RIVER_WIDTH;
-    const min = base * 0.5;
-    const amp = base * 0.25;
-    const freq = 0.003; // wavelength ~ 2000 units
+// Replace the entire width calculation section with:
+const base = RIVER_WIDTH;
+let distance = state.riverControlPoints.length * SEGMENT_LENGTH;
 
-    let distance = state.riverControlPoints.length * SEGMENT_LENGTH; // rough
-    let width = min + amp + Math.sin(distance * freq) * amp;
+// Much more dramatic variation (0.2x to 3x base width)
+const minWidth = base * 0.2;  // Very narrow
+const maxWidth = base * 3.0;  // Very wide
+
+// Faster frequency changes for more visible variation
+const primaryWave = Math.sin(distance * 0.008) * 0.6;  // Increased frequency and amplitude
+const secondaryWave = Math.sin(distance * 0.02) * 0.3;
+
+// More frequent resets
+const resetCycle = Math.sin(distance * 0.003) > 0.7 ? 0 : primaryWave + secondaryWave;
+
+let targetWidth = base + (maxWidth - base) * resetCycle;
+targetWidth = Math.max(minWidth, Math.min(maxWidth, targetWidth));
+
+if (shouldForceDefaultWidth(distance)) {
+  targetWidth = base;
+}
+
+// Remove smoothing for now to see raw changes
+let width = targetWidth;
+
+state.riverWidths.push(width);
+
+
     state.riverWidths.push(width);    
     pos = cp.pos; angle = cp.angle;
   }
@@ -152,13 +190,37 @@ export function extendRiverIfNeeded() {
     let lastAngle = Math.atan2(lastPos.x - prevPos.x, -(lastPos.z - prevPos.z));
     let cp = addControlPoint(lastPos, lastAngle);
     state.riverControlPoints.push(cp.pos);
-    const base = RIVER_WIDTH;
-    const min = base * 0.5;
-    const amp = base * 0.25;
-    const freq = 0.003; // wavelength ~ 2000 units
+// Replace the entire width calculation section with:
+const base = RIVER_WIDTH;
+let distance = state.riverControlPoints.length * SEGMENT_LENGTH;
 
-    let distance = state.riverControlPoints.length * SEGMENT_LENGTH; // rough
-    let width = min + amp + Math.sin(distance * freq) * amp;
+// Much more dramatic variation (0.2x to 3x base width)
+const minWidth = base * 0.2;  // Very narrow
+const maxWidth = base * 3.0;  // Very wide
+
+// Faster frequency changes for more visible variation
+const primaryWave = Math.sin(distance * 0.008) * 0.6;  // Increased frequency and amplitude
+const secondaryWave = Math.sin(distance * 0.02) * 0.3;
+
+// More frequent resets
+const resetCycle = Math.sin(distance * 0.003) > 0.7 ? 0 : primaryWave + secondaryWave;
+
+let targetWidth = base + (maxWidth - base) * resetCycle;
+targetWidth = Math.max(minWidth, Math.min(maxWidth, targetWidth));
+
+if (shouldForceDefaultWidth(distance)) {
+  targetWidth = base;
+}
+
+// Remove smoothing for now to see raw changes
+let width = targetWidth;
+
+state.riverWidths.push(width);
+// Smooth transition from previous width
+let prevWidth = state.riverWidths.length > 0 ? state.riverWidths[state.riverWidths.length - 1] : base;
+ width = smoothWidthTransition(prevWidth, targetWidth);
+
+
     state.riverWidths.push(width);        
     updateRiverSpline();
     createRiverMesh();
