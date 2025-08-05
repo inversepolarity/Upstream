@@ -9,7 +9,7 @@ import player_super_frag from './shaders/player/superpos_frag.glsl';
 export function createTrainCubes() {
   state.trainCubes = [];
   const geo = new THREE.BoxGeometry(PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE);
-  
+
   for (let i = 0; i < 5; i++) {
     let material;
     if (i === 4) {
@@ -17,7 +17,7 @@ export function createTrainCubes() {
         uniforms: { time: { value: 0 } },
         vertexShader: player_super_vertex,
         fragmentShader: player_super_frag,
-        transparent: true
+        transparent: true,
       });
     } else {
       material = state.playerShaderMaterial.clone();

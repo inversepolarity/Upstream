@@ -29,7 +29,6 @@ import player_default_vertex from './shaders/player/default_vertex.glsl';
 import player_default_frag from './shaders/player/default_frag.glsl';
 
 export function init() {
-
   if (state.renderer && state.renderer.domElement && state.renderer.domElement.parentNode) {
     state.renderer.domElement.parentNode.removeChild(state.renderer.domElement);
   }
@@ -51,14 +50,15 @@ export function init() {
   createStarfield();
   state.scene.add(new THREE.AmbientLight(0xffffff, 0.8));
   const light = new THREE.DirectionalLight(0xffffff, 0.5);
-  light.position.set(5, 10, 7); state.scene.add(light);
+  light.position.set(5, 10, 7);
+  state.scene.add(light);
 
   state.playerUniforms = { time: { value: 0 }, isJumping: { value: 0 } };
   state.playerShaderMaterial = new THREE.ShaderMaterial({
     uniforms: state.playerUniforms,
     vertexShader: player_default_vertex,
     fragmentShader: player_default_frag,
-    transparent: true
+    transparent: true,
   });
 
   const geo = new THREE.BoxGeometry(PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE);
@@ -66,22 +66,26 @@ export function init() {
   state.scene.add(state.player);
 
   createTrainCubes();
-  state.trainCubes.forEach(cube => {
-    cube.visible = false; 
+  state.trainCubes.forEach((cube) => {
+    cube.visible = false;
   });
 
-  state.gameOver = false; 
-  document.getElementById("gameover").style.display = "none";
+  state.gameOver = false;
+  document.getElementById('gameover').style.display = 'none';
   resetState();
-  
-  generateInitialRiver(); 
+
+  generateInitialRiver();
   createRiverMesh();
 
-  state.playerDistance = 10; state.playerOffset = 0;
+  state.playerDistance = 10;
+  state.playerOffset = 0;
   let info = getRiverInfoByDistance(state.playerDistance);
-  state.player.position.copy(info.point.clone().add(info.left.clone().multiplyScalar(state.playerOffset)));
-  state.player.position.y += PLAYER_SIZE/2;
-  state.camPos.copy(state.camera.position); state.camTarget.copy(info.point);
+  state.player.position.copy(
+    info.point.clone().add(info.left.clone().multiplyScalar(state.playerOffset))
+  );
+  state.player.position.y += PLAYER_SIZE / 2;
+  state.camPos.copy(state.camera.position);
+  state.camTarget.copy(info.point);
 
   // Reset all animation states
   state.isJumping = false;
@@ -90,12 +94,13 @@ export function init() {
   state.wasHyperdrive = false;
   state.isFalling = false;
   state.fallTimer = 0;
-  state.fallDirection = null;  
+  state.fallDirection = null;
 }
 
 export function animate() {
   if (!state.gameOver) {
-    extendRiverIfNeeded(); pruneRiverBehind();
+    extendRiverIfNeeded();
+    pruneRiverBehind();
 
     let moveDist = SPEED * state.speedMultiplier;
     state.playerDistance += moveDist;
@@ -126,25 +131,26 @@ export function animate() {
 
     if (state.hyperdrive) {
       state.player.visible = false;
-      state.trainCubes.forEach(cube => cube.visible = true);
+      state.trainCubes.forEach((cube) => (cube.visible = true));
       updateTrainPosition(info, info.tangent);
     } else {
       state.player.visible = true;
-      state.trainCubes.forEach(cube => cube.visible = false);
-      state.player.position.copy(playerPos); 
-      state.player.position.y += PLAYER_SIZE/2;
+      state.trainCubes.forEach((cube) => (cube.visible = false));
+      state.player.position.copy(playerPos);
+      state.player.position.y += PLAYER_SIZE / 2;
     }
 
     if (state.isJumping) {
       state.jumpTimer--;
-      let jumpPhase = 1 - Math.abs(state.jumpTimer - JUMP_DURATION/2) / (JUMP_DURATION/2);
+      let jumpPhase = 1 - Math.abs(state.jumpTimer - JUMP_DURATION / 2) / (JUMP_DURATION / 2);
       if (!state.hyperdrive) {
         state.player.position.y += JUMP_HEIGHT * jumpPhase;
         state.player.rotation.x = Math.PI * 2 * (1 - state.jumpTimer / JUMP_DURATION);
       }
-      if (state.jumpTimer <= 0) { 
-        state.isJumping = false; state.jumpTimer = 0; 
-        if (!state.hyperdrive) state.player.rotation.x = 0; 
+      if (state.jumpTimer <= 0) {
+        state.isJumping = false;
+        state.jumpTimer = 0;
+        if (!state.hyperdrive) state.player.rotation.x = 0;
       }
     } else if (!state.hyperdrive) {
       state.player.rotation.x = 0;
@@ -156,7 +162,7 @@ export function animate() {
     }
 
     let tangent = info.tangent;
-    if (tangent.dot(new THREE.Vector3(0,0,-1)) < 0.7) {
+    if (tangent.dot(new THREE.Vector3(0, 0, -1)) < 0.7) {
       state.gracePeriod = 60;
       let turnAngle = Math.atan2(tangent.x, tangent.z);
       state.targetRotation = turnAngle * 0.8;
@@ -169,8 +175,9 @@ export function animate() {
     if (!state.hyperdrive) state.player.rotation.z = state.cubeRotation;
 
     state.obstacleSpawnTimer++;
-    if (state.obstacleSpawnTimer > 180) { 
-      spawnObstacle(); state.obstacleSpawnTimer = 0; 
+    if (state.obstacleSpawnTimer > 180) {
+      spawnObstacle();
+      state.obstacleSpawnTimer = 0;
     }
 
 for (let i = state.obstacles.length - 1; i >= 0; i--) {
@@ -234,22 +241,33 @@ for (let i = state.obstacles.length - 1; i >= 0; i--) {
 }
 
     state.gapSpawnTimer++;
-    if (state.gapSpawnTimer > 320) { spawnGap(); state.gapSpawnTimer = 0; }
+    if (state.gapSpawnTimer > 320) {
+      spawnGap();
+      state.gapSpawnTimer = 0;
+    }
     for (let i = state.riverGaps.length - 1; i >= 0; i--) {
       if (state.riverGaps[i].distance < state.playerDistance - 50) {
         if (state.riverGaps[i].edgeMesh) {
           for (let m of state.riverGaps[i].edgeMesh) {
-            state.scene.remove(m); m.geometry.dispose(); m.material.dispose();
+            state.scene.remove(m);
+            m.geometry.dispose();
+            m.material.dispose();
           }
         }
-        state.riverGaps.splice(i, 1); createRiverMesh();
+        state.riverGaps.splice(i, 1);
+        createRiverMesh();
       }
     }
 
     let lookAheadInfo = getRiverInfoByDistance(state.playerDistance + 30);
-    let camGoal = playerPos.clone().add(new THREE.Vector3(0, 8, 0)).add(tangent.clone().multiplyScalar(-12));
-    state.camPos.lerp(camGoal, 0.08); state.camTarget.lerp(lookAheadInfo.point, 0.12);
-    state.camera.position.copy(state.camPos); state.camera.lookAt(state.camTarget);
+    let camGoal = playerPos
+      .clone()
+      .add(new THREE.Vector3(0, 8, 0))
+      .add(tangent.clone().multiplyScalar(-12));
+    state.camPos.lerp(camGoal, 0.08);
+    state.camTarget.lerp(lookAheadInfo.point, 0.12);
+    state.camera.position.copy(state.camPos);
+    state.camera.lookAt(state.camTarget);
 
     updateStarfield(STARFIELD_SPEED, playerPos, tangent);
 

@@ -1,5 +1,4 @@
 import './constants.js';
-import { state } from './state.js';
 import './backdrop.js';
 import './river.js';
 import './player.js';

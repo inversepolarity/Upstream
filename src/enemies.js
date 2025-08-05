@@ -39,7 +39,7 @@ export function spawnObstacle() {
 
   let material = new THREE.MeshStandardMaterial({ 
     color: OBSTACLE_COLORS[Math.floor(Math.random() * OBSTACLE_COLORS.length)],
-    emissive: 0x333333
+    emissive: 0x333333,
   });
   
   let obstacle = new THREE.Mesh(geometry, material);
