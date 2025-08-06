@@ -5,7 +5,7 @@ import { hideNewGameOverlay } from './hud.js';
 
 window.addEventListener('keydown', (e) => {
   let k = e.key.toLowerCase();
-  
+
   if (state.gameOver) {
     state.obstacles.forEach((obs) => {
       state.scene.remove(obs);
@@ -44,23 +44,23 @@ window.addEventListener('keydown', (e) => {
     });
 
     init();
-  }   
+  }
 
   if (k === ' ') {
-    if(state.rpo && !state.gameOver){
+    if (state.rpo && !state.gameOver) {
       state.inputUp = true;
       state.speedMultiplier = 8;
       if (!state.hyperdrive) state.wasHyperdrive = false;
       state.hyperdrive = true;
-      } 
+    }
 
     if (!state.gameOver && state.rpo == false) {
       state.rpo = true;
       hideNewGameOverlay();
-    }      
+    }
   }
 
-  if(state.rpo){
+  if (state.rpo) {
     if (k === 'arrowleft' || k === 'a') state.inputLeft = true;
     if (k === 'arrowright' || k === 'd') state.inputRight = true;
     if (k === 'arrowdown' || k === 's') {
@@ -71,7 +71,7 @@ window.addEventListener('keydown', (e) => {
     if ((e.key === 'w' || e.code === 'ArrowUp') && !state.isJumping && !state.gameOver) {
       state.isJumping = true;
       state.jumpTimer = JUMP_DURATION;
-    } 
+    }
   }
 });
 

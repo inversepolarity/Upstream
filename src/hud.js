@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { state, resetState } from './state.js';
+import { state } from './state.js';
 
 import ui_vertex from './shaders/ui/vertex.glsl';
 import ui_frag from './shaders/ui/fragment.glsl';
@@ -84,7 +84,7 @@ export function gameOverDisplay() {
     canvas.width / 2,
     canvas.height / 2 + fontSize * 0.8
   );
-  
+
   // Fade in with CSS after a tick
   requestAnimationFrame(() => {
     canvas.style.opacity = '1';
@@ -188,11 +188,6 @@ export function initScoreState() {
 }
 
 export function createScoreDisplay() {
-  // Create render target for score text
-  const renderTarget = new THREE.WebGLRenderTarget(512, 128);
-
-  // Create scene for rendering text
-  const textScene = new THREE.Scene();
   const textCamera = new THREE.OrthographicCamera(-256, 256, 64, -64, 0.1, 10);
   textCamera.position.z = 5;
 

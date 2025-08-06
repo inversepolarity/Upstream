@@ -10,11 +10,10 @@ import { spawnObstacle } from './enemies.js';
 import { spawnGap } from './river.js';
 import {
   createScoreDisplay,
-  updateScoreDisplay,
   updateScore,
   gameOverDisplay,
   hideGameOverOverlay,
-  newGameDisplay
+  newGameDisplay,
 } from './hud.js';
 
 import {
@@ -252,7 +251,8 @@ export function animate() {
         if (
           dDist < PLAYER_SIZE * 2 &&
           offsetDist < obs.userData.size + PLAYER_SIZE / 2 &&
-          !state.isJumping && state.rpo
+          !state.isJumping &&
+          state.rpo
         ) {
           state.gameOver = true;
           gameOverDisplay();
@@ -303,7 +303,8 @@ export function animate() {
     for (let i = 0; i < state.riverGaps.length; i++) {
       if (
         Math.abs(state.playerDistance - state.riverGaps[i].distance) <
-        state.riverGaps[i].width * 0.5 && state.rpo
+          state.riverGaps[i].width * 0.5 &&
+        state.rpo
       ) {
         shouldDie = true;
         break;
@@ -482,16 +483,15 @@ export function animate() {
         gameOverDisplay();
       }
     }
-  } 
+  }
 
-  if(!state.rpo){
-      newGameDisplay();
-    } else {
-      if(state.gameOver){
-      gameOverDisplay();        
-      }
+  if (!state.rpo) {
+    newGameDisplay();
+  } else {
+    if (state.gameOver) {
+      gameOverDisplay();
     }
-  
+  }
 
   // Enable autoClear for the first render
   state.renderer.autoClear = true;
