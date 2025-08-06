@@ -2,13 +2,7 @@ import * as THREE from 'three';
 import { state, resetState } from './state.js';
 import { createStarfield, updateStarfield } from './backdrop.js';
 
-import {
-  PLAYER_SIZE,
-  SPEED,
-  STARFIELD_SPEED,
-  JUMP_DURATION,
-  JUMP_HEIGHT,
-} from './constants.js';
+import { PLAYER_SIZE, SPEED, STARFIELD_SPEED, JUMP_DURATION, JUMP_HEIGHT } from './constants.js';
 
 import { createTrainCubes, updateTrainPosition } from './player.js';
 

@@ -1,9 +1,7 @@
 import * as THREE from 'three';
 import { state } from './state.js';
 import { PLAYER_SIZE } from './constants.js';
-import {
-  getRiverPositionWithCurve,
-} from './river.js';
+import { getRiverPositionWithCurve } from './river.js';
 
 import player_super_vertex from './shaders/player/superpos_vertex.glsl';
 import player_super_frag from './shaders/player/superpos_frag.glsl';
