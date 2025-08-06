@@ -55,7 +55,7 @@ export const state = {
 
   trainCubes: [],
   isFalling: false,
-  riverWidths: [],
+  isGapFall: false,
 };
 
 export function resetState() {
@@ -123,4 +123,5 @@ export function resetState() {
   // Add any missing state that might have been added during gameplay
   state.fallTimer = 0;
   state.fallDirection = null;
+  state.isGapFall = false;
 }
