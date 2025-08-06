@@ -8,6 +8,14 @@ import { createTrainCubes, updateTrainPosition } from './player.js';
 
 import { spawnObstacle } from './enemies.js';
 import { spawnGap } from './river.js';
+import {
+  createScoreDisplay,
+  updateScoreDisplay,
+  updateScore,
+  gameOverDisplay,
+  hideGameOverOverlay,
+  newGameDisplay
+} from './hud.js';
 
 import {
   generateInitialRiver,
@@ -24,6 +32,8 @@ import player_default_vertex from './shaders/player/default_vertex.glsl';
 import player_default_frag from './shaders/player/default_frag.glsl';
 
 export function init() {
+  hideGameOverOverlay();
+
   if (state.renderer && state.renderer.domElement && state.renderer.domElement.parentNode) {
     state.renderer.domElement.parentNode.removeChild(state.renderer.domElement);
   }
@@ -90,12 +100,23 @@ export function init() {
   state.isFalling = false;
   state.fallTimer = 0;
   state.fallDirection = null;
+
+  //score
+  if (state.scoreCanvas && state.scoreCanvas.parentNode) {
+    state.scoreCanvas.parentNode.removeChild(state.scoreCanvas);
+  }
+
+  createScoreDisplay();
+  state.score = 0;
 }
 
 export function animate() {
   if (!state.gameOver) {
     extendRiverIfNeeded();
     pruneRiverBehind();
+
+    state.score = state.playerDistance * 0.1;
+    updateScore();
 
     let moveDist = SPEED * state.speedMultiplier;
     state.playerDistance += moveDist;
@@ -231,10 +252,10 @@ export function animate() {
         if (
           dDist < PLAYER_SIZE * 2 &&
           offsetDist < obs.userData.size + PLAYER_SIZE / 2 &&
-          !state.isJumping
+          !state.isJumping && state.rpo
         ) {
           state.gameOver = true;
-          document.getElementById('gameover').style.display = 'block';
+          gameOverDisplay();
         }
       }
     }
@@ -244,6 +265,7 @@ export function animate() {
       spawnGap();
       state.gapSpawnTimer = 0;
     }
+
     for (let i = state.riverGaps.length - 1; i >= 0; i--) {
       if (state.riverGaps[i].distance < state.playerDistance - 50) {
         if (state.riverGaps[i].edgeMesh) {
@@ -281,7 +303,7 @@ export function animate() {
     for (let i = 0; i < state.riverGaps.length; i++) {
       if (
         Math.abs(state.playerDistance - state.riverGaps[i].distance) <
-        state.riverGaps[i].width * 0.5
+        state.riverGaps[i].width * 0.5 && state.rpo
       ) {
         shouldDie = true;
         break;
@@ -310,7 +332,7 @@ export function animate() {
       state.isFalling = true;
       state.fallTimer = 0;
       state.isGapFall = true; // New flag for gap falls
-      document.getElementById('gameover').style.display = 'block';
+      //document.getElementById('gameover').style.display = 'block';
     }
 
     if (Math.abs(state.playerOffset) > maxSafeOffset) {
@@ -454,13 +476,39 @@ export function animate() {
       }
 
       // Show game over after the full dramatic sequence
-      if (state.fallTimer > 50) {
+      if (state.fallTimer > 50 && state.rpo) {
         state.gameOver = true;
-        document.getElementById('gameover').style.display = 'block';
+        // document.getElementById('gameover').style.display = 'block';
+        gameOverDisplay();
       }
     }
+  } 
+
+  if(!state.rpo){
+      newGameDisplay();
+    } else {
+      if(state.gameOver){
+      gameOverDisplay();        
+      }
+    }
+  
+
+  // Enable autoClear for the first render
+  state.renderer.autoClear = true;
+
+  // Render main scene
+  state.renderer.render(state.scene, state.camera);
+
+  // Disable autoClear for HUD overlay
+  state.renderer.autoClear = false;
+
+  // Render HUD on top
+  if (state.hudScene && state.hudCamera) {
+    state.renderer.render(state.hudScene, state.hudCamera);
   }
 
-  state.renderer.render(state.scene, state.camera);
+  // Re-enable autoClear for next frame
+  state.renderer.autoClear = true;
+
   requestAnimationFrame(animate);
 }

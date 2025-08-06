@@ -15,7 +15,7 @@ export const state = {
   player: undefined,
   playerDistance: 0,
   playerOffset: 0,
-  gameOver: false,
+  gameOver: true,
 
   inputLeft: false,
   inputRight: false,
@@ -56,6 +56,8 @@ export const state = {
   trainCubes: [],
   isFalling: false,
   isGapFall: false,
+  score: 0,
+  rpo: false,
 };
 
 export function resetState() {
@@ -124,4 +126,12 @@ export function resetState() {
   state.fallTimer = 0;
   state.fallDirection = null;
   state.isGapFall = false;
+  state.score = 0;
+  state.rpo = false;
+}
+
+export function initScoreState() {
+  state.score = state.score || 0;
+  state.displayScore = state.displayScore || 0;
+  state.scoreVelocity = state.scoreVelocity || 0;
 }
