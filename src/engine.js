@@ -75,7 +75,7 @@ export function init() {
   });
 
   state.gameOver = false;
-  document.getElementById('gameover').style.display = 'none';
+  // document.getElementById('gameover').style.display = 'none';
   resetState();
 
   generateInitialRiver();

@@ -3,10 +3,9 @@ import { JUMP_DURATION } from './constants.js';
 import { init } from './engine.js';
 import { hideNewGameOverlay } from './hud.js';
 
-window.addEventListener('keydown', (e) => {
+window.addEventListener('keydown', (e) => { 
   let k = e.key.toLowerCase();
-
-  if (state.gameOver) {
+  if (state.gameOver && state.rpo == false) {
     state.obstacles.forEach((obs) => {
       state.scene.remove(obs);
       obs.geometry.dispose();
@@ -79,8 +78,6 @@ window.addEventListener('keyup', (e) => {
   if (!state.rpo) return;
 
   let k = e.key.toLowerCase();
-
-  // Add these missing lines:
   if (k === 'arrowleft' || k === 'a') state.inputLeft = false;
   if (k === 'arrowright' || k === 'd') state.inputRight = false;
 
@@ -90,7 +87,21 @@ window.addEventListener('keyup', (e) => {
 
     if (state.hyperdrive) state.wasHyperdrive = true;
     state.hyperdrive = false;
+    if (state.gameOver && state.rpo == true) {
+      state.rpo = false;
+      init();
+      // break;
+      return;
+
+    }
+
   }
+
+    if (state.gameOver && state.rpo == true) {
+      state.rpo = false;
+
+    }
+
 
   if (k === 'arrowdown' || k === 's') {
     state.inputDown = false;
