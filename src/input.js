@@ -3,7 +3,7 @@ import { JUMP_DURATION } from './constants.js';
 import { init } from './engine.js';
 import { hideNewGameOverlay } from './hud.js';
 
-window.addEventListener('keydown', (e) => { 
+window.addEventListener('keydown', (e) => {
   let k = e.key.toLowerCase();
   if (state.gameOver && state.rpo == false) {
     state.obstacles.forEach((obs) => {
@@ -92,16 +92,12 @@ window.addEventListener('keyup', (e) => {
       init();
       // break;
       return;
-
     }
-
   }
 
-    if (state.gameOver && state.rpo == true) {
-      state.rpo = false;
-
-    }
-
+  if (state.gameOver && state.rpo == true) {
+    state.rpo = false;
+  }
 
   if (k === 'arrowdown' || k === 's') {
     state.inputDown = false;
