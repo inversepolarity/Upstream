@@ -126,7 +126,7 @@ export function newGameDisplay() {
   ctx.fillStyle = '#ff8383';
 
   ctx.fillText(
-    'U       P       S       T       R       E       A       M',
+    'U       P       S       T       R       E       ▲       M',
     canvas.width / 2,
     canvas.height / 2.25
   );
