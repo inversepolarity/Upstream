@@ -11,26 +11,39 @@
         position: relative;
       }
 
+
+      a{
+        color: white;
+        text-decoration: none;
+      }
+
+      a:hover {
+        color: hotpink;
+      }
+
       canvas {
         display: block;
       }
 
       #about {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+        top: 98%;
+        left: 96%;
         color: white;
-        font-size: 48px;
+        font-size: 10px;
         font-family: Arial, sans-serif;
         text-align: center;
-        display: none;
-        z-index: 1001;
+        /*display: none;*/
+        z-index: 9999;
+      }
+
+      #controls {
+
       }
     </style>
   </head>
   <body>
-    <div id="about">evenzero</div>
+    <div id="about"><a href="https://evenzero.in">evenzero</a> / <a href="https://ip.evenzero.in">ip</a></div>
 
     <!-- Game Start -->
     <script type="module" src="./src/imports.js"></script>
