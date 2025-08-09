@@ -1,0 +1,294 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+  height: 100vh;
+  position: relative;
+}
+
+.hud {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 11px;
+  backdrop-filter: blur(8px);
+  width: 300px; /* fixed width */
+}
+.hud button,
+.hud input,
+.hud a {
+  outline: none; /* No focus ring */
+}
+
+.hud button:focus,
+.hud input:focus,
+.hud a:focus {
+  outline: none;
+}
+
+.hud * {
+  user-select: none; /* optional: no text selection */
+}
+
+/* Remove from tab order */
+.hud button,
+.hud input,
+.hud a {
+  tabindex: -1; /* can't set via CSS — needs HTML attr */
+}
+
+.top-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 240px;
+}
+
+.bottom-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.thumb {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.loading {
+  font-size: 10px;
+  animation: pulse 1.5s infinite;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.title {
+  overflow: hidden;
+  position: relative;
+}
+
+.title-text {
+  display: inline-block;
+  white-space: nowrap;
+  min-width: max-content; /* text takes full width of content */
+}
+
+/* Apply marquee only if overflowing */
+.title:has(.title-text) {
+  --scroll-distance: calc(-100%);
+}
+
+.title:has(.title-text:where(:not(:only-child))) {
+  animation: marquee-title 12s linear infinite;
+}
+
+@keyframes marquee-title {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(var(--scroll-distance));
+  }
+}
+
+.title-text.marquee {
+  animation: marquee-title 8s linear infinite;
+}
+
+.channel {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.6);
+  height: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.channel-text {
+  white-space: nowrap;
+  animation: none;
+}
+
+.channel-text.marquee {
+  animation: marquee-channel 10s linear infinite;
+}
+
+@keyframes marquee-title {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(0);
+  }
+  80% {
+    transform: translateX(calc(-100% + var(--container-width)));
+  }
+  100% {
+    transform: translateX(calc(-100% + var(--container-width)));
+  }
+}
+
+@keyframes marquee-channel {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(0);
+  }
+  80% {
+    transform: translateX(calc(-100% + var(--container-width)));
+  }
+  100% {
+    transform: translateX(calc(-100% + var(--container-width)));
+  }
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between; /* pushes groups to opposite sides */
+  align-items: center;
+  width: 100%;
+}
+
+.controls-left {
+  display: flex;
+  gap: 4px;
+}
+
+.controls-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn {
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 1);
+}
+
+.btn.active {
+  background: rgba(91, 44, 44, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(91, 44, 44, 0.8);
+}
+
+.progress {
+  width: 80px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+  margin: 0 4px;
+}
+
+.progress-bar {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.1s;
+}
+
+.volume {
+  width: 50px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+}
+
+.volume-bar {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 2px;
+  width: 50%;
+}
+
+/* Hidden player */
+#playerWrap {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+}
+#player {
+  width: 1px;
+  height: 1px;
+}
+
+.loader-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  backdrop-filter: blur(4px);
+}
+
+.hidden {
+  display: none !important;
+}

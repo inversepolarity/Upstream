@@ -3,47 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <title>U P S T R E A M</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        position: relative;
-      }
-
-
-      a{
-        color: white;
-        text-decoration: none;
-      }
-
-      a:hover {
-        color: hotpink;
-      }
-
-      canvas {
-        display: block;
-      }
-
-      #about {
-        position: absolute;
-        top: 98%;
-        left: 96%;
-        color: white;
-        font-size: 10px;
-        font-family: Arial, sans-serif;
-        text-align: center;
-        /*display: none;*/
-        z-index: 9999;
-      }
-
-      #controls {
-
-      }
-    </style>
+    <script src="https://www.youtube.com/iframe_api" async></script>
+    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="radio.css" />
   </head>
-  <body>
-    <div id="about"><a href="https://evenzero.in">evenzero</a> / <a href="https://ip.evenzero.in">ip</a></div>
+  <body tabindex="-1">
+    <!-- Radio player -->
+    <div class="hud">
+      <div class="loader-overlay" id="mainLoader">
+        <div class="loading">Loading player...</div>
+      </div>
+
+      <div class="top-row">
+        <div class="thumb">
+          <img id="thumb" src="" class="hidden" />
+          <div id="thumbLoader" class="loading hidden">...</div>
+        </div>
+
+        <div class="info">
+          <div class="title" id="titleContainer">
+            <div class="title-text" id="title">Loading...</div>
+          </div>
+          <div class="channel" id="channelContainer">
+            <div class="channel-text" id="channel">Preparing playlist...</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-row">
+        <div class="controls">
+          <div class="controls-left">
+            <button class="btn" id="prev">⟨</button>
+            <button class="btn hidden" id="play">▶</button>
+            <button class="btn" id="pause">⏸</button>
+            <button class="btn" id="next">⟩</button>
+          </div>
+        </div>
+        <div class="controls-right">
+          <div class="volume" id="volumeWrap">
+            <div class="volume-bar" id="volumeBar"></div>
+          </div>
+          <button class="btn active" id="mute">🔇</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden player -->
+    <div id="playerWrap">
+      <div id="player"></div>
+    </div>
+
+    <!-- About -->
+    <div id="about">
+      <a href="https://evenzero.in">evenzero</a> / <a href="https://ip.evenzero.in">ip</a>
+    </div>
 
     <!-- Game Start -->
     <script type="module" src="./src/imports.js"></script>

@@ -7,6 +7,7 @@ import './hud.js';
 import { init, animate } from './engine.js';
 
 import './input.js';
+import './radio.js';
 
 init();
 animate();

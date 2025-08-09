@@ -1,0 +1,31 @@
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  color: hotpink;
+}
+
+canvas {
+  display: block;
+}
+
+#about {
+  position: absolute;
+  top: 98%;
+  left: 96%;
+  color: white;
+  font-size: 10px;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  /*display: none;*/
+  z-index: 9999;
+}
