@@ -25,6 +25,7 @@ body {
   font-size: 11px;
   backdrop-filter: blur(8px);
   width: 300px; /* fixed width */
+  opacity: 0.5;
 }
 .hud button,
 .hud input,
@@ -47,6 +48,10 @@ body {
 .hud input,
 .hud a {
   tabindex: -1; /* can't set via CSS — needs HTML attr */
+}
+
+.hud:hover{
+  opacity: 1;
 }
 
 .top-row {
