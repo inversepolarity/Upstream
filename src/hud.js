@@ -29,7 +29,7 @@ export function updateScoreDisplay() {
   const scoreText = `${state.displayScore.toFixed(10)}`;
 
   // Draw text
-  ctx.fillText(scoreText, canvas.width / 20, canvas.height / 7.7);
+  ctx.fillText(scoreText, canvas.width / 20, canvas.height / 7);
 
   // Update texture
   state.scoreTexture.needsUpdate = true;
@@ -126,8 +126,8 @@ export function newGameDisplay() {
   ctx.fillStyle = '#ff8383';
 
   ctx.fillText(
-    'U       P       S       T       R       E       ▲       M',
-    canvas.width / 2,
+    'U      P      S      T      R      E      ▲      M',
+    (canvas.width / 2),
     canvas.height / 2.25
   );
   // Restart instruction text
@@ -159,24 +159,25 @@ export function updateScore() {
   if (state.rpo && !state.gameOver && state.score !== undefined) {
     // Calculate the difference between target and displayed score
     const diff = state.score - state.displayScore;
-
+    
     // Smooth acceleration/deceleration (scaled down by 60x)
     const acceleration = diff * 0.001667; // 0.1 / 60
     state.scoreVelocity = state.scoreVelocity * 0.9983 + acceleration * 0.001667; // 0.9^(1/60) ≈ 0.9983, 0.1/60
-
-    // Add one smallest unit per frame (this stays the same as it's already per-frame)
+    
+    // Add one smallest unit per frame in the correct direction
     let smallestUnit = 0.0000000001;
+    const direction = diff >= 0 ? 1 : -1; // Determine direction
+    
     if (state.hyperdrive) {
-      state.displayScore += state.scoreVelocity + smallestUnit + 1;
+      state.displayScore += state.scoreVelocity + (smallestUnit * direction) + 1;
     } else {
-      state.displayScore += state.scoreVelocity + smallestUnit;
+      state.displayScore += state.scoreVelocity + (smallestUnit * direction);
     }
-
+    
     // Ensure we don't overshoot
     if (Math.abs(diff) < smallestUnit * 10) {
       state.displayScore = state.score;
     }
-
     updateScoreDisplay();
   }
 }
