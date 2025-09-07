@@ -126,10 +126,18 @@ export function newGameDisplay() {
   ctx.fillStyle = '#ff8383';
 
   ctx.fillText(
-    'U      P      S      T      R      E      ▲      M',
+    'U      P      S      T      R      E            M',
     (canvas.width / 2),
     canvas.height / 2.25
   );
+  
+  ctx.fillText(
+    '▲',
+    (canvas.width / 1.22),
+    canvas.height / 2.31
+  );
+  
+  
   // Restart instruction text
   const restartFontSize = Math.floor(fontSize * 0.25);
   ctx.font = `${restartFontSize}px sans-serif`;
