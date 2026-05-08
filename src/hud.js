@@ -92,11 +92,9 @@ export function gameOverDisplay() {
 }
 
 export function newGameDisplay() {
-  // If overlay already exists, do nothing
   let existing = document.getElementById('gameover-overlay');
   if (existing) return;
 
-  // Create a new canvas
   const canvas = document.createElement('canvas');
   canvas.id = 'gameover-overlay';
   canvas.width = window.innerWidth;
@@ -108,17 +106,15 @@ export function newGameDisplay() {
   canvas.style.height = '100vh';
   canvas.style.pointerEvents = 'none';
   canvas.style.zIndex = '9999';
-  canvas.style.opacity = '0'; // Start transparent
+  canvas.style.opacity = '0';
   canvas.style.transition = 'opacity 0.8s cubic-bezier(.4,0,.2,1)';
 
   document.body.appendChild(canvas);
   const ctx = canvas.getContext('2d');
 
-  // Minimal reddish-orange transparent background
   ctx.fillStyle = 'rgba(91, 44, 44, 0.4)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Minimal, wide, centered text
   const fontSize = Math.floor(canvas.width * 0.05);
   ctx.font = `${fontSize}px sans-serif`;
   ctx.textAlign = 'center';
@@ -126,19 +122,11 @@ export function newGameDisplay() {
   ctx.fillStyle = '#ff8383';
 
   ctx.fillText(
-    'U      P      S      T      R      E            M',
-    (canvas.width / 2),
+    'U      P      S      T      R      E      ▲      M',
+    canvas.width / 2,
     canvas.height / 2.25
   );
-  
-  ctx.fillText(
-    '▲',
-    (canvas.width / 1.22),
-    canvas.height / 2.31
-  );
-  
-  
-  // Restart instruction text
+
   const restartFontSize = Math.floor(fontSize * 0.25);
   ctx.font = `${restartFontSize}px sans-serif`;
   ctx.fillStyle = '#ff8383';
@@ -147,7 +135,7 @@ export function newGameDisplay() {
     canvas.width / 2,
     canvas.height / 2 + fontSize * 0.8
   );
-  // Fade in with CSS after a tick
+
   requestAnimationFrame(() => {
     canvas.style.opacity = '1';
   });
@@ -167,21 +155,21 @@ export function updateScore() {
   if (state.rpo && !state.gameOver && state.score !== undefined) {
     // Calculate the difference between target and displayed score
     const diff = state.score - state.displayScore;
-    
+
     // Smooth acceleration/deceleration (scaled down by 60x)
     const acceleration = diff * 0.001667; // 0.1 / 60
     state.scoreVelocity = state.scoreVelocity * 0.9983 + acceleration * 0.001667; // 0.9^(1/60) ≈ 0.9983, 0.1/60
-    
+
     // Add one smallest unit per frame in the correct direction
     let smallestUnit = 0.0000000001;
     const direction = diff >= 0 ? 1 : -1; // Determine direction
-    
+
     if (state.hyperdrive) {
       state.displayScore += state.scoreVelocity + (smallestUnit * direction) + 1;
     } else {
       state.displayScore += state.scoreVelocity + (smallestUnit * direction);
     }
-    
+
     // Ensure we don't overshoot
     if (Math.abs(diff) < smallestUnit * 10) {
       state.displayScore = state.score;

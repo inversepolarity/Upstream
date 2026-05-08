@@ -20,12 +20,12 @@ canvas {
 
 #about {
   position: absolute;
-  top: 98%;
-  left: 96%;
+  top: 100%;
+  left: calc(100% - 80px);
+  width: 100px;
   color: white;
   font-size: 10px;
   font-family: Arial, sans-serif;
   text-align: center;
-  /*display: none;*/
   z-index: 9999;
 }
