@@ -91,6 +91,50 @@ export function gameOverDisplay() {
   });
 }
 
+function inkShift(ctx, char) {
+  const metrics = ctx.measureText(char);
+  return ((metrics.actualBoundingBoxLeft ?? 0) - (metrics.actualBoundingBoxRight ?? 0)) / 2;
+}
+
+function drawVerticallyCentered(ctx, text, centerX, centerY) {
+  const prevAlign = ctx.textAlign;
+  const prevBaseline = ctx.textBaseline;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+
+  const cells = [];
+  let x = centerX - ctx.measureText(text).width / 2;
+  for (const char of text) {
+    const width = ctx.measureText(char).width;
+    cells.push({ char, center: x + width / 2 });
+    x += width;
+  }
+
+  const triangle = cells.findIndex((c) => c.char === '▲');
+  if (triangle > 0 && triangle < cells.length - 1) {
+    let left = triangle - 1;
+    while (left > 0 && cells[left].char === ' ') left--;
+    let right = triangle + 1;
+    while (right < cells.length - 1 && cells[right].char === ' ') right++;
+    if (cells[left].char !== ' ' && cells[right].char !== ' ') {
+      const leftInk = cells[left].center + inkShift(ctx, cells[left].char);
+      const rightInk = cells[right].center + inkShift(ctx, cells[right].char);
+      cells[triangle].center = (leftInk + rightInk) / 2 - inkShift(ctx, cells[triangle].char);
+    }
+  }
+
+  for (const cell of cells) {
+    if (cell.char === ' ') continue;
+    const metrics = ctx.measureText(cell.char);
+    const ascent = metrics.actualBoundingBoxAscent ?? metrics.fontBoundingBoxAscent ?? 0;
+    const descent = metrics.actualBoundingBoxDescent ?? metrics.fontBoundingBoxDescent ?? 0;
+    ctx.fillText(cell.char, cell.center, centerY + (ascent - descent) / 2);
+  }
+
+  ctx.textAlign = prevAlign;
+  ctx.textBaseline = prevBaseline;
+}
+
 export function newGameDisplay() {
   let existing = document.getElementById('gameover-overlay');
   if (existing) return;
@@ -121,7 +165,8 @@ export function newGameDisplay() {
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#ff8383';
 
-  ctx.fillText(
+  drawVerticallyCentered(
+    ctx,
     'U      P      S      T      R      E      ▲      M',
     canvas.width / 2,
     canvas.height / 2.25
